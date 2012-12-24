@@ -10,8 +10,11 @@ import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IValueChangeListener;
 import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -30,7 +33,10 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
+import ru.nsu.ccfit.resync.Activator;
+import ru.nsu.ccfit.resync.pref.SimplePreferenceSynchronizer;
 import ru.nsu.ccfit.resync.storage.PreferenceStorage;
+import ru.nsu.ccfit.resync.storage.PreferenceStorageException;
 
 public class ResyncDialog extends  Dialog  {
 	private static final String SYNCHRONIZE_BUTTON_CONTENT = "Synchronize";
@@ -148,18 +154,21 @@ public class ResyncDialog extends  Dialog  {
 	  			    try {
 	  			        location = new URL(url.getUrl());
 	  			    } catch (MalformedURLException e) {
-	  				    // TODO: handle exception
+	  			    	Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+	    		    	ErrorDialog.openError(shell, "Error", e.getMessage(), status);
 	  			    }
 	    		    try {
 	    			    PreferencesStorageUtils utils = new PreferencesStorageUtils();
-	    			  
+	    			    
 	    			    // TODO: options == null?
 	    			    PreferenceStorage storage = utils.getFactory(location).open(location, null);
 	    			    storage.pull();
+	    			    SimplePreferenceSynchronizer.synchronize(storage);
+	    			    shell.close();
 	    		    } catch (Exception e) {
-					  // TODO: handle exception
-				    }
-	                shell.close();
+	    		    	Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+	    		    	ErrorDialog.openError(shell, "Error", e.getMessage(), status);
+				    }	                
 	    	    } else {
 	    	        urlText.setFocus();
 	    	    }
@@ -173,7 +182,22 @@ public class ResyncDialog extends  Dialog  {
 	    upload.addSelectionListener(new SelectionAdapter() {
 	        public void widgetSelected(SelectionEvent event) {
 	    	    if (currentStatus.isOK()) {
-	                shell.close();
+	    	    	URL location = null;
+	  			    try {
+	  			        location = new URL(url.getUrl());
+	  			    } catch (MalformedURLException e) {
+	  			    	Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+	    		    	ErrorDialog.openError(shell, "Error", e.getMessage(), status);
+	  			    }
+	    	    	PreferencesStorageUtils utils = new PreferencesStorageUtils();
+	    	    	try {
+						PreferenceStorage storage = utils.getWritableStorage(location);
+						//TODO: Hasn't implementation for preferences putting
+						storage.push();
+					} catch (Exception e) {
+						Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+	    		    	ErrorDialog.openError(shell, "Error", e.getMessage(), status);
+					}
 	    	    } else {
 	    	        urlText.setFocus();
 	    	    }  

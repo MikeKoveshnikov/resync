@@ -3,6 +3,8 @@ package ru.nsu.ccfit.resync.ui;
 import java.net.URL;
 import java.util.ArrayList;
 
+import ru.nsu.ccfit.resync.storage.PreferenceStorage;
+import ru.nsu.ccfit.resync.storage.PreferenceStorageException;
 import ru.nsu.ccfit.resync.storage.PreferenceStorageFactory;
 import ru.nsu.ccfit.resync.storage.disk.DiskStorageFactory;
 import ru.nsu.ccfit.resync.storage.github.GithubStorageFactory;
@@ -22,6 +24,18 @@ public class PreferencesStorageUtils {
 		for (PreferenceStorageFactory factory : factories) {
 			if (factory.canOpen(url)) {
 				return factory;
+			}
+		}
+		return null;
+	}
+    
+    public PreferenceStorage getWritableStorage(URL url) throws PreferenceStorageException {
+		for (PreferenceStorageFactory factory : factories) {
+			if (factory.canOpen(url)) {
+				PreferenceStorage storage = factory.open(url, null);
+				if (storage.canWrite()) {
+					return storage;
+				}
 			}
 		}
 		return null;
