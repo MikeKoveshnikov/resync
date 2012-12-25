@@ -3,8 +3,10 @@ package ru.nsu.ccfit.resync.pref.jdt;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import ru.nsu.ccfit.resync.pref.Preference;
 import ru.nsu.ccfit.resync.pref.PreferenceProvider;
@@ -15,6 +17,7 @@ public class SpCleanup implements PreferenceProvider {
     private static final String BUNDLE = "org.eclipse.jdt.ui";
     private static final String DELIMETER = "/";
     private static final String PREFIX = BUNDLE + DELIMETER;
+    private static final String PLUGIN_ID = "ru.nsu.ccfit.resync";
 
     // @formatter:off
     private static final List<String> OPTIONS = Arrays.asList(
@@ -90,8 +93,15 @@ public class SpCleanup implements PreferenceProvider {
 
     @Override
     public Collection<Preference> exportPreferences() {
-        // TODO: implement this
-        return Collections.emptyList();
+        ScopedPreferenceStore scopedPreferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, BUNDLE);
+        List<Preference> exportedPreferences = new ArrayList<Preference>();
+        for (String option : OPTIONS) {
+            String value = scopedPreferenceStore.getString(option.substring(PREFIX.length()));
+            String key = option;
+            if (value != null && value.length() != 0) {
+                exportedPreferences.add(Preference.newInstance(BUNDLE, key, value));
+            }
+        }
+        return exportedPreferences;
     }
-
 }

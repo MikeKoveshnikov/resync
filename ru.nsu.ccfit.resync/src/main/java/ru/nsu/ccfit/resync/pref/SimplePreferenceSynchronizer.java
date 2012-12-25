@@ -12,6 +12,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import ru.nsu.ccfit.resync.pref.jdt.SpCleanup;
 import ru.nsu.ccfit.resync.storage.PreferenceStorage;
 
 public enum SimplePreferenceSynchronizer {
@@ -38,8 +39,6 @@ public enum SimplePreferenceSynchronizer {
 
                 list.add(preference);
             }
-
-            preferences.addAll(preferences);
         }
 
         for (String name : bundlePreferenes.keySet()) {
@@ -58,6 +57,17 @@ public enum SimplePreferenceSynchronizer {
             } catch (IOException e) {
                 error("failed to sync preferences for " + name, e);
             }
+        }
+    }
+
+    public static void exportToStorage(PreferenceStorage storage) {
+        storage.clear();
+        SpCleanup spCleanup = new SpCleanup();
+        Collection<Preference> exportPreferences = spCleanup.exportPreferences();
+        for (Preference preference : exportPreferences) {
+            String key = preference.getKey();
+            String value = preference.getValue();
+            storage.put(key, value);
         }
     }
 
