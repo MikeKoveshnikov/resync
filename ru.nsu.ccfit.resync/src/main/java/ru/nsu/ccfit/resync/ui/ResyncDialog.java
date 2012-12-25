@@ -54,6 +54,7 @@ public class ResyncDialog extends TitleAreaDialog {
 	private static final int LIST_COLUMN_SPAN = 2;
 	private static final int MARGIN = 10;
 	private static final RGB RGB_RED = new RGB(255, 0, 0);
+	private static final RGB RGB_GREEN = new RGB(0, 255, 0);
     private Shell parent;
     private Url url = new Url();
     private IStatus currentStatus;
@@ -90,7 +91,7 @@ public class ResyncDialog extends TitleAreaDialog {
 	    new Label(parent, SWT.NONE);
 
         final Label validationErrorLabel = new Label(parent, SWT.NONE);
-        validationErrorLabel.setForeground(new Color(null, RGB_RED));
+        
         validationErrorLabel.setLayoutData(gridData);
         
         GridDataFactory.swtDefaults().hint(ERROR_LABLE_X_HINT, SWT.DEFAULT).applyTo(validationErrorLabel);
@@ -114,9 +115,9 @@ public class ResyncDialog extends TitleAreaDialog {
 			public void handleValueChange(ValueChangeEvent event) {
 				currentStatus = (IStatus) event.diff.getNewValue();
 				if (currentStatus.isOK()) {
-					validationErrorLabel.setVisible(false);
+					validationErrorLabel.setForeground(new Color(null, RGB_GREEN));
 				} else {
-					validationErrorLabel.setVisible(true);
+					validationErrorLabel.setForeground(new Color(null, RGB_RED));
 				}
 			}
 		});
@@ -142,22 +143,22 @@ public class ResyncDialog extends TitleAreaDialog {
 			}
 		});
 	    urlList.setLayoutData(gridData);
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
-	    urlList.add("file://C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
+	    urlList.add("file:///C:\\example.properties");
 	    
 	    new Label(parent, SWT.NONE);
     }
