@@ -1,23 +1,13 @@
 package ru.nsu.ccfit.resync.pref.jdt;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
-
-import ru.nsu.ccfit.resync.pref.Preference;
-import ru.nsu.ccfit.resync.pref.PreferenceProvider;
-import ru.nsu.ccfit.resync.storage.PreferenceStorage;
-
-public class SpCleanup implements PreferenceProvider {
+public class SpCleanup extends AbstractPreferenceProvider {
 
     private static final String BUNDLE = "org.eclipse.jdt.ui";
     private static final String DELIMETER = "/";
     private static final String PREFIX = BUNDLE + DELIMETER;
-    private static final String PLUGIN_ID = "ru.nsu.ccfit.resync";
 
     // @formatter:off
     private static final List<String> OPTIONS = Arrays.asList(
@@ -76,32 +66,18 @@ public class SpCleanup implements PreferenceProvider {
     // @formatter:on
 
     @Override
-    public Collection<Preference> getPreferences(PreferenceStorage storage) {
-        List<Preference> preferences = new ArrayList<Preference>();
-
-        for (String option : OPTIONS) {
-            String value = storage.get(option, null);
-            String key = option.substring(PREFIX.length());
-
-            if (value != null) {
-                preferences.add(Preference.newInstance(BUNDLE, key, value));
-            }
-        }
-
-        return preferences;
+    protected Iterable<String> getOptions() {
+        return OPTIONS;
     }
 
     @Override
-    public Collection<Preference> exportPreferences() {
-        ScopedPreferenceStore scopedPreferenceStore = new ScopedPreferenceStore(InstanceScope.INSTANCE, BUNDLE);
-        List<Preference> exportedPreferences = new ArrayList<Preference>();
-        for (String option : OPTIONS) {
-            String value = scopedPreferenceStore.getString(option.substring(PREFIX.length()));
-            String key = option;
-            if (value != null && value.length() != 0) {
-                exportedPreferences.add(Preference.newInstance(BUNDLE, key, value));
-            }
-        }
-        return exportedPreferences;
+    protected String getPrefix() {
+        return PREFIX;
     }
+
+    @Override
+    protected String getBundle() {
+        return BUNDLE;
+    }
+
 }

@@ -3,6 +3,8 @@ package ru.nsu.ccfit.resync.pref;
 import java.util.Arrays;
 import java.util.Collection;
 
+import ru.nsu.ccfit.resync.pref.jdt.Cleanup;
+import ru.nsu.ccfit.resync.pref.jdt.Formatter;
 import ru.nsu.ccfit.resync.pref.jdt.SpCleanup;
 
 /**
@@ -14,6 +16,8 @@ public enum PreferenceProviderRegistry {
     INSTANCE;
 
     private final SpCleanup spCleanup = new SpCleanup();
+    private final Cleanup cleanup = new Cleanup();
+    private final Formatter formatter = new Formatter();
 
     private PreferenceProviderRegistry() {
     }
@@ -30,7 +34,7 @@ public enum PreferenceProviderRegistry {
         // TODO: in future implementation it should be able to disable specific
         // provider
 
-        return Arrays.<PreferenceProvider> asList(spCleanup);
+        return Arrays.<PreferenceProvider> asList(spCleanup, cleanup, formatter);
     }
 
     public static PreferenceProviderRegistry getInstance() {

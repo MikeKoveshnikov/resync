@@ -38,20 +38,4 @@ public class SpCleanupTests {
         assertEquals("sp_cleanup.remove_trailing_whitespaces_ignore_empty", first.getKey());
         assertEquals("true", first.getValue());
     }
-
-    @Test
-    public void testExport() throws Exception {
-        // arrange
-        Map<String, String> original = new HashMap<String, String>();
-        original.put("org.eclipse.jdt.ui/sp_cleanup.remove_trailing_whitespaces_ignore_empty", "true");
-
-        PreferenceStorageStub storage = new PreferenceStorageStub(original);
-        storage.pull();
-
-        PreferenceProvider provider = new SpCleanup();
-
-        // act
-        Collection<Preference> preferences = provider.exportPreferences();
-
-    }
 }
