@@ -13,11 +13,11 @@ import ru.nsu.ccfit.resync.storage.PreferenceStorage;
 
 public abstract class AbstractPreferenceProvider implements PreferenceProvider {
 
-    abstract protected Iterable<String> getOptions();
+    protected abstract Iterable<String> getOptions();
 
-    abstract protected String getPrefix();
+    protected abstract String getPrefix();
 
-    abstract protected String getBundle();
+    protected abstract String getBundle();
 
     @Override
     public Collection<Preference> getPreferences(PreferenceStorage storage) {

@@ -12,21 +12,26 @@ import org.eclipse.core.databinding.observable.value.ValueChangeEvent;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.databinding.swt.SWTObservables;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
@@ -35,8 +40,14 @@ import org.eclipse.swt.widgets.Text;
 import ru.nsu.ccfit.resync.Activator;
 import ru.nsu.ccfit.resync.pref.SimplePreferenceSynchronizer;
 import ru.nsu.ccfit.resync.storage.PreferenceStorage;
+import ru.nsu.ccfit.resync.storage.PreferenceStorageException;
+import ru.nsu.ccfit.resync.storage.PreferenceStorageFactory;
 
-public class ResyncDialog extends Dialog {
+public class ResyncDialog extends TitleAreaDialog {
+    private static final String NO_IMPLEMENTATIONS_EXCEPTION_MESSAGE = "There is no implementations "
+            + "which can handle this URL";
+    private static final String TITLE = "Synchronize";
+    private static final String MESSAGE = "Synchronize your preferences";
     private static final String SYNCHRONIZE_BUTTON_CONTENT = "Synchronize";
     private static final String UPLOAD_BUTTON_CONTENT = "Upload";
     private static final String URL_LABLE_CONTENT = "Url:";
@@ -44,46 +55,47 @@ public class ResyncDialog extends Dialog {
     private static final int URL_LIST_WIDTH_HINT = 300;
     private static final int URL_LIST_HEIGHT_HINT = 200;
     private static final int ERROR_LABLE_X_HINT = 150;
+    private static final int LIST_COLUMN_SPAN = 2;
+    private static final int MARGIN = 10;
+    private static final RGB RGB_RED = new RGB(255, 0, 0);
+    private static final RGB RGB_GREEN = new RGB(0, 255, 0);
     private Shell parent;
     private Url url = new Url();
     private IStatus currentStatus;
+    private Text urlText = null;
 
     public ResyncDialog(Shell parent) {
         super(parent);
         this.parent = parent;
     }
 
-    public int open() {
-        Shell shell = new Shell(parent);
-        createContents(shell);
-        shell.pack();
-        shell.open();
-        Display display = parent.getDisplay();
-        while (!shell.isDisposed()) {
-            if (!display.readAndDispatch()) {
-                display.sleep();
-            }
-        }
-        return 1;
-    }
+    private void createMyContents(final Composite parent) {
+        parent.getShell().setImage(getDefaultImage());
+        parent.getShell().setText(TITLE);
 
-    private void createContents(final Shell shell) {
-        shell.setLayout(new GridLayout(NUM_COLUMNS, true));
+        GridLayout layout = new GridLayout();
+        layout.numColumns = NUM_COLUMNS;
+        layout.marginWidth = MARGIN;
+        layout.marginHeight = MARGIN;
 
-        Label label = new Label(shell, SWT.NONE);
+        parent.setLayout(layout);
+
+        GridData gridData = new GridData();
+        gridData.grabExcessHorizontalSpace = true;
+        gridData.horizontalAlignment = GridData.FILL;
+
+        Label label = new Label(parent, SWT.NONE);
         label.setText(URL_LABLE_CONTENT);
-        GridData data = new GridData(GridData.FILL_HORIZONTAL);
-        label.setLayoutData(data);
 
-        final Text urlText = new Text(shell, SWT.BORDER);
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        urlText.setLayoutData(data);
+        urlText = new Text(parent, SWT.BORDER);
+        urlText.setLayoutData(gridData);
         ControlDecoration urlTextDecoration = createControlDecoration(urlText, "Please, enter valid Url");
 
-        new Label(shell, SWT.NONE).setText("Validation Error:");
+        new Label(parent, SWT.NONE);
 
-        Label validationErrorLabel = new Label(shell, SWT.NONE);
-        validationErrorLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        final Label validationErrorLabel = new Label(parent, SWT.NONE);
+
+        validationErrorLabel.setLayoutData(gridData);
 
         GridDataFactory.swtDefaults().hint(ERROR_LABLE_X_HINT, SWT.DEFAULT).applyTo(validationErrorLabel);
 
@@ -101,17 +113,22 @@ public class ResyncDialog extends Dialog {
             @Override
             public void handleValueChange(ValueChangeEvent event) {
                 currentStatus = (IStatus) event.diff.getNewValue();
+                if (currentStatus.isOK()) {
+                    validationErrorLabel.setForeground(new Color(null, RGB_GREEN));
+                } else {
+                    validationErrorLabel.setForeground(new Color(null, RGB_RED));
+                }
             }
         });
 
         dataBindingContext.bindValue(SWTObservables.observeText(validationErrorLabel), aggregateValidationStatus, null,
                 null);
 
-        data = new GridData(GridData.FILL_HORIZONTAL);
-        data.horizontalSpan = 2;
-        data.heightHint = URL_LIST_HEIGHT_HINT;
-        data.widthHint = URL_LIST_WIDTH_HINT;
-        final List urlList = new List(shell, SWT.H_SCROLL | SWT.V_SCROLL);
+        gridData = new GridData(GridData.FILL_HORIZONTAL);
+        gridData.horizontalSpan = LIST_COLUMN_SPAN;
+        gridData.heightHint = URL_LIST_HEIGHT_HINT;
+        gridData.widthHint = URL_LIST_WIDTH_HINT;
+        final List urlList = new List(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         urlList.addSelectionListener(new SelectionListener() {
 
             @Override
@@ -124,80 +141,26 @@ public class ResyncDialog extends Dialog {
 
             }
         });
-        urlList.setLayoutData(data);
-        urlList.add("file://C:\\example.properties");
-        urlList.add("file://C:\\example.properties");
+
+        urlList.setLayoutData(gridData);
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
         urlList.add("file://localhost/c:/Users/Mike/Desktop/Resync/demo");
         urlList.add("https://gist.github.com/617e1ebee5e3cf325a87");
-        urlList.add("file://C:\\example.properties");
-        urlList.add("file://C:\\example.properties");
-        urlList.add("file://C:\\example.properties");
-        urlList.add("file://C:\\example.properties");
-        urlList.add("hello");
-        urlList.add("");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
+        urlList.add("file:///C:\\example.properties");
 
-        Button synchronize = new Button(shell, SWT.PUSH);
-        synchronize.setText(SYNCHRONIZE_BUTTON_CONTENT);
-        data = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-        synchronize.setLayoutData(data);
-        synchronize.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                if (currentStatus.isOK()) {
-                    URL location = null;
-                    try {
-                        location = new URL(url.getUrl());
-                    } catch (MalformedURLException e) {
-                        Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
-                        ErrorDialog.openError(shell, "Error", e.getMessage(), status);
-                    }
-                    try {
-                        PreferencesStorageUtils utils = new PreferencesStorageUtils();
-
-                        // TODO: options == null?
-                        PreferenceStorage storage = utils.getFactory(location).open(location, null);
-                        storage.pull();
-                        SimplePreferenceSynchronizer.synchronize(storage);
-                        shell.close();
-                    } catch (Exception e) {
-                        Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
-                        ErrorDialog.openError(shell, "Error", e.getMessage(), status);
-                    }
-                } else {
-                    urlText.setFocus();
-                }
-            }
-        });
-
-        Button upload = new Button(shell, SWT.PUSH);
-        upload.setText(UPLOAD_BUTTON_CONTENT);
-        data = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-        upload.setLayoutData(data);
-        upload.addSelectionListener(new SelectionAdapter() {
-            public void widgetSelected(SelectionEvent event) {
-                if (currentStatus.isOK()) {
-                    URL location = null;
-                    try {
-                        location = new URL(url.getUrl());
-                    } catch (MalformedURLException e) {
-                        Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
-                        ErrorDialog.openError(shell, "Error", e.getMessage(), status);
-                    }
-                    PreferencesStorageUtils utils = new PreferencesStorageUtils();
-                    try {
-                        PreferenceStorage storage = utils.getWritableStorage(location);
-                        SimplePreferenceSynchronizer.exportToStorage(storage);
-                        // TODO: Hasn't implementation for preferences putting
-                        storage.push();
-                    } catch (Exception e) {
-                        Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
-                        ErrorDialog.openError(shell, "Error", e.getMessage(), status);
-                    }
-                } else {
-                    urlText.setFocus();
-                }
-            }
-        });
-        shell.setDefaultButton(synchronize);
+        new Label(parent, SWT.NONE);
     }
 
     private static ControlDecoration createControlDecoration(Control control, String hoverText) {
@@ -207,5 +170,130 @@ public class ResyncDialog extends Dialog {
                 FieldDecorationRegistry.DEC_ERROR);
         controlDecoration.setImage(fieldDecoration.getImage());
         return controlDecoration;
+    }
+
+    private void showErrorDialog(Shell shell, Exception e) {
+        Status status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+        ErrorDialog.openError(shell, "Error", e.getMessage(), status);
+    }
+
+    protected void initializeBounds(Shell shell) {
+        Rectangle bounds = parent.getBounds();
+        Rectangle rect = shell.getBounds();
+        int x = bounds.x + (bounds.width - rect.width) / 2;
+        int y = bounds.y + (bounds.height - rect.height) / 2;
+        shell.setLocation(x, y);
+    }
+
+    @Override
+    public void create() {
+        super.create();
+        setTitle(TITLE);
+        setMessage(MESSAGE, IMessageProvider.INFORMATION);
+    }
+
+    @Override
+    protected Control createDialogArea(Composite parent) {
+        createMyContents(parent);
+        return parent;
+    }
+
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        GridData gridData = new GridData();
+        gridData.verticalAlignment = GridData.END;
+        gridData.grabExcessHorizontalSpace = true;
+        gridData.grabExcessVerticalSpace = true;
+        gridData.horizontalAlignment = SWT.RIGHT;
+
+        parent.setLayoutData(gridData);
+        createSynchronizeButton(parent, OK, SYNCHRONIZE_BUTTON_CONTENT, true);
+        createUploadButton(parent, OK, UPLOAD_BUTTON_CONTENT, true);
+    }
+
+    protected Button createSynchronizeButton(final Composite parent, int id, String label, boolean defaultButton) {
+        ((GridLayout) parent.getLayout()).numColumns++;
+        Button button = new Button(parent, SWT.PUSH);
+        button.setText(label);
+        button.setFont(JFaceResources.getDialogFont());
+        button.setData(new Integer(id));
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                if (currentStatus.isOK()) {
+                    URL location = null;
+                    try {
+                        location = new URL(url.getUrl());
+                    } catch (MalformedURLException e) {
+                        showErrorDialog(parent.getShell(), e);
+                    }
+                    PreferencesStorageUtils utils = new PreferencesStorageUtils();
+                    try {
+                        PreferenceStorageFactory factory = utils.getFactory(location);
+                        if (factory == null) {
+                            throw new PreferenceStorageException(NO_IMPLEMENTATIONS_EXCEPTION_MESSAGE);
+                        } else {
+                            PreferenceStorage storage = factory.open(location, null);
+                            storage.pull();
+                            SimplePreferenceSynchronizer.synchronize(storage);
+                            close();
+                        }
+                    } catch (Exception e) {
+                        showErrorDialog(parent.getShell(), e);
+                    }
+                } else {
+                    urlText.setFocus();
+                }
+            }
+        });
+        if (defaultButton) {
+            Shell shell = parent.getShell();
+            if (shell != null) {
+                shell.setDefaultButton(button);
+            }
+        }
+        setButtonLayoutData(button);
+        return button;
+    }
+
+    protected Button createUploadButton(final Composite parent, int id, String label, boolean defaultButton) {
+        ((GridLayout) parent.getLayout()).numColumns++;
+        Button button = new Button(parent, SWT.PUSH);
+        button.setText(label);
+        button.setFont(JFaceResources.getDialogFont());
+        button.setData(new Integer(id));
+        button.addSelectionListener(new SelectionAdapter() {
+            public void widgetSelected(SelectionEvent event) {
+                if (currentStatus.isOK()) {
+                    URL location = null;
+                    try {
+                        location = new URL(url.getUrl());
+                    } catch (MalformedURLException e) {
+                        showErrorDialog(parent.getShell(), e);
+                    }
+                    try {
+                        PreferencesStorageUtils utils = new PreferencesStorageUtils();
+                        PreferenceStorage writableStorage = utils.getWritableStorage(location);
+                        if (writableStorage == null) {
+                            throw new PreferenceStorageException(NO_IMPLEMENTATIONS_EXCEPTION_MESSAGE);
+                        } else {
+                            SimplePreferenceSynchronizer.exportToStorage(writableStorage);
+                            writableStorage.push();
+                        }
+                    } catch (Exception e) {
+                        showErrorDialog(parent.getShell(), e);
+                    }
+                } else {
+                    urlText.setFocus();
+                }
+            }
+        });
+        if (defaultButton) {
+            Shell shell = parent.getShell();
+            if (shell != null) {
+                shell.setDefaultButton(button);
+            }
+        }
+        setButtonLayoutData(button);
+        return button;
     }
 }

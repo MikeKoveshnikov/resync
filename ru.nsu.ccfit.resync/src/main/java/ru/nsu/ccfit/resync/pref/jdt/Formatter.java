@@ -28,7 +28,8 @@ public class Formatter extends AbstractPreferenceProvider {
             PREFIX + "org.eclipse.jdt.core.formatter.blank_lines_before_field",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_while",
             PREFIX + "org.eclipse.jdt.core.formatter.use_on_off_tags",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_between_empty_parens_in_annotation_type_member_declaration",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_between_empty_parens_in_annotation_type_member_declaration",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_new_line_before_else_in_if_statement",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_prefix_operator",
             PREFIX + "org.eclipse.jdt.core.formatter.keep_else_statement_on_same_line",
@@ -130,7 +131,8 @@ public class Formatter extends AbstractPreferenceProvider {
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_question_in_conditional",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_question_in_wildcard",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_try",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_closing_bracket_in_array_allocation_expression",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_before_closing_bracket_in_array_allocation_expression",
             PREFIX + "org.eclipse.jdt.core.formatter.comment.preserve_white_space_between_code_and_line_comments",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_parenthesized_expression_in_throw",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_comma_in_type_arguments",
@@ -185,12 +187,14 @@ public class Formatter extends AbstractPreferenceProvider {
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_and_in_type_parameter",
             PREFIX + "org.eclipse.jdt.core.compiler.compliance",
             PREFIX + "org.eclipse.jdt.core.formatter.continuation_indentation_for_array_initializer",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_between_empty_brackets_in_array_allocation_expression",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_between_empty_brackets_in_array_allocation_expression",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_at_in_annotation_type_declaration",
             PREFIX + "org.eclipse.jdt.core.formatter.alignment_for_arguments_in_allocation_expression",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_cast",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_unary_operator",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_closing_angle_bracket_in_parameterized_type_reference",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_before_closing_angle_bracket_in_parameterized_type_reference",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_anonymous_type_declaration",
             PREFIX + "org.eclipse.jdt.core.formatter.keep_empty_array_initializer_on_one_line",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_new_line_in_empty_enum_declaration",
@@ -225,7 +229,8 @@ public class Formatter extends AbstractPreferenceProvider {
             PREFIX + "org.eclipse.jdt.core.formatter.number_of_blank_lines_at_beginning_of_method_body",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_colon_in_conditional",
             PREFIX + "org.eclipse.jdt.core.formatter.indent_body_declarations_compare_to_type_header",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_annotation_type_member_declaration",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_before_opening_paren_in_annotation_type_member_declaration",
             PREFIX + "org.eclipse.jdt.core.formatter.wrap_before_binary_operator",
             PREFIX + "org.eclipse.jdt.core.formatter.indent_body_declarations_compare_to_enum_declaration_header",
             PREFIX + "org.eclipse.jdt.core.formatter.blank_lines_between_type_declarations",
@@ -247,10 +252,12 @@ public class Formatter extends AbstractPreferenceProvider {
             PREFIX + "org.eclipse.jdt.core.formatter.comment.format_html",
             PREFIX + "org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_method_declaration",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_closing_angle_bracket_in_type_parameters",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_opening_bracket_in_array_allocation_expression",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_before_opening_bracket_in_array_allocation_expression",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_new_line_in_empty_anonymous_type_declaration",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_colon_in_conditional",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_opening_angle_bracket_in_parameterized_type_reference",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_after_opening_angle_bracket_in_parameterized_type_reference",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_closing_paren_in_for",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_postfix_operator",
             PREFIX + "org.eclipse.jdt.core.formatter.comment.format_source_code",
@@ -283,7 +290,8 @@ public class Formatter extends AbstractPreferenceProvider {
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_method_declaration",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_semicolon_in_for",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_catch",
-            PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_opening_angle_bracket_in_parameterized_type_reference",
+            PREFIX + "org.eclipse.jdt.core.formatter." 
+                   + "insert_space_before_opening_angle_bracket_in_parameterized_type_reference",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_comma_in_multiple_field_declarations",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_before_closing_paren_in_annotation",
             PREFIX + "org.eclipse.jdt.core.formatter.insert_space_after_comma_in_parameterized_type_reference",
